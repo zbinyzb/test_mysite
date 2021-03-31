@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第一个页面</title>
+    <link rel="stylesheet" href="/static/css/mystyle.css">
+    <script src="/static/js/vue.js"></script>
+    <script src="/static/js/axios.js"></script>
+</head>
+<body>
+    <div id="home">
+        <div v-show=onOff>
+        {% comment %} <div v-show=onOff>同样视觉效果可实际不同 {% endcomment %}
+            <div class="header">
+            <h1>
+                {{ siteinfo.title }}
+            </h1>
+            <img src="/upload/{{ siteinfo.logo }}" alt="">
+            </div>
+        
+            <hr>
+            <div class="content">
+                <div class="menu">  
+                    <div v-if="item.id==choosed" v-for="item in classes" class="item" style="background: #777;
+                    color: #fff">
+                        <a>"[[item.text]]"</a>
+                    </div>
+                    <div v-else v-on:click="chooseClass(item.id)" class="item">
+                        <a>"[[item.text]]"</a>
+                    </div>
+
+                </div>
+                <div v-if="item.id==choosed" v-for="item in classes" class="userlist">
+                    <p>[[item.text]]</p>
+                    <hr>
+                    <div v-if="item.userlist.length>0" v-for="user in item.userlist"  class="user">
+                        <img v-bind:src="jpg_url + user.headImg" alt="">
+                        <p>[[user.nickName]]</p>
+                    </div>
+                    <div v-else class="user">
+                    </div>
+                <p v-else>没有用户</p>
+
+             {% comment %} {% if userless %}
+             {% for user in userless %}
+                <div class="user">
+                    <img src="/upload/{{ user.headImg }}" alt="">
+                    <p>{{ user.nickName }}</p>
+                </div>
+             {% endfor %}
+             {% else %}
+             <p>没有用户</p>
+             {% endif %}  {% endcomment %}
+                </div>
+            {% comment %} <p v-if="movies.length==0">尚未获取</p>
+            <div class="imglist">
+                <img v-for="img in movies"  v-bind:src="apiurl + img.pic" alt="">
+            </div>
+            <button v-on:click="getData()">获取视频</button> {% endcomment %}
+            </div>
+            <hr>
+        </div>
+
+        <input v-model="inputText" type="text" name="" id="" style="height:30px;width:700px">
+        <p>[[inputText]]</p>
+        <div class="foot">
+            Copyright © 2020 Zbin
+            <button @click="onOffClick">开关</button>
+        </div>
+    </div>
+{% comment %} <script>
+    new Vue({
+        el:'#home',
+        data:{
+            apiurl:'https://api.dweb.club/',
+            movies:[]
+        },
+        methods:{
+            getData(){
+                var self = this
+                axios({
+                    method:'get',
+                    type:'json',
+                    url:'https://api.dweb.club/dweb-api/get-index-data'
+                }).then(function (res){
+                    console.log(res.data.newsdata)
+                    self.movies = res.data.newsdata
+                })
+            }
+        }
+    })
+</script> {% endcomment %}
+    
+
+<script>
+    new Vue({
+        delimiters:['[[',']]'],
+        el:'#home',
+        data:{
+            jpg_url:'/upload/',
+            choosed: 1,
+            classes: [],
+            onOff: false,
+            inputText:''
+        },
+        mounted() {
+            this.getData()
+        },
+        methods: {
+            getData(){
+                axios({
+                    url:'/api/',
+                    type:'json',
+                    method:'get',
+                }).then((res)=>{
+                    console.log(res.data.classes)
+                    this.classes = res.data.classes
+                })
+            },
+            chooseClass(id){
+                console.log(id),
+                this.choosed = id
+            },
+            onOffClick(){
+                this.onOff = !this.onOff
+            }
+        },
+
+    })
+</script>
+</body>
+</html>
